@@ -22,10 +22,6 @@ Activate virtual environment `source virtualEnv/bin/activate`<br>
 Deactivate virtual env : `deactivate`<br>
 
 
-## Run the app
-For test environment `uvicorn main:app --reload`
-
-
 
 
 ## Packages for teh project
@@ -34,5 +30,10 @@ install Packages  `pip install -r requirements.txt`  <br>
 Update requirements file , after installing new package `pip freeze > requirements.txt pip install -r requirements.txt` <br>
 
 
+## Run the app
+For test environment `uvicorn main:app --reload`
 
-#
+
+# Firebase Auth 
+Goto Firebase console : https://console.firebase.google.com/  <br>
+Add Project <br>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" />
+    <link href="{{ url_for('static', path='/css/main.css') }}" rel="stylesheet" />
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .login-form {
+            max-width: 400px;
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 767px) {
+            .login-form {
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-form" id="vue_app">
+        <h2 class="text-center mb-4">User Registration</h2>
+
+        <div class="alert alert-danger" role="alert" v-if="error_message">
+            [[error_message]]
+        </div>
+
+        <form @submit.prevent="signup_form_submission">
+            <div class="mb-3">
+                <label for="username" class="form-label">Email</label>
+                <input type="email" class="form-control" id="username" placeholder="Enter your Email" v-model="email"
+                    required />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input :type="password_visible ? 'text' : 'password' " class="form-control" id="password"
+                        placeholder="Enter your password" v-model="password" required />
+                    <button class="btn btn-outline-secondary" type="button" v-if="password_visible"
+                        @click="toggle_password_visibility">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" v-if="!password_visible"
+                        @click="toggle_password_visibility">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password2" class="form-label">Retype Password</label>
+                <div class="input-group">
+                    <input :type="password2_visible ? 'text' : 'password' " class="form-control" id="password2"
+                        placeholder="Retype your password" v-model="password2" required />
+                    <button class="btn btn-outline-secondary" type="button" v-if="password2_visible"
+                        @click="toggle_password2_visibility">
+                        <i class="bi bi-eye-slash"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" v-if="!password2_visible"
+                        @click="toggle_password2_visibility">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+
+        <div class="mt-3 text-center">
+            Already have an account? <a href="/login">Login</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script src="{{ url_for('static', path='/javascript/axios.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/javascript/vue.js') }}"></script>
+
+
+
+    <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js'
+
+
+        // Add Firebase products that you want to use
+        import { getAuth,createUserWithEmailAndPassword,sendEmailVerification  } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js'
+
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAoLWeOUwHg--jTIc1k9RhiYREI9VhWi7Q",
+            authDomain: "git-auth-project.firebaseapp.com",
+            projectId: "git-auth-project",
+            storageBucket: "git-auth-project.appspot.com",
+            messagingSenderId: "531813829325",
+            appId: "1:531813829325:web:247a7bea4ab93d885d3784",
+            measurementId: "G-L65RE20B18",
+        };
+
+        // Initialize Firebase
+        const FireBaseApp = initializeApp(firebaseConfig);
+        const FireBaseAuth = getAuth(FireBaseApp);
+   
+
+
+        const app = Vue.createApp({
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    password_visible: false,
+                    password2_visible: false,
+                    email: '',
+                    password: '',
+                    password2: '',
+                    error_message: '',
+                };
+            },
+            methods: {
+                toggle_password_visibility: function () {
+                    this.password_visible = !this.password_visible;
+                },
+                toggle_password2_visibility: function () {
+                    this.password2_visible = !this.password2_visible;
+                },
+
+                signup_form_submission: async function () {
+                    try {
+                        this.password = this.password.trim();
+                        this.password2 = this.password2.trim();
+                        if (!this.email || !this.password) {
+                            throw "Email and password Mandetory";
+                        } else if (this.password != this.password2) {
+                            throw "Password and retype password should be same";
+                        } else if (this.password.length < 6) {
+                            throw "Password should be atleast 6 characters";
+                        } else {
+                            const userCredential = await createUserWithEmailAndPassword(FireBaseAuth, this.email, this.password)
+                            const user = userCredential.user;
+                            console.log(user);
+                            if(!user.emailVerified){
+                               const status = await sendEmailVerification(FireBaseAuth.currentUser)
+                               console.log(status);
+                            }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        const errorCode = error.code;
+                        // const errorMessage = error.message;
+                        // console.log(errorMessage);
+                        console.log(errorCode);
+
+                        if (errorCode == "auth/email-already-in-use") {
+                            this.error_message = "Email already in use";
+                        } else if (errorCode == "auth/invalid-email") {
+                            this.error_message ="Invalid Email";
+                        } else if (errorCode == "auth/weak-password") {
+                            this.error_message = "Weak Password";
+                        } else {
+                            this.error_message = "Server error : Please try again later"
+                        }
+                    }
+
+                },
+            },
+        });
+        app.mount("#vue_app");
+    </script>
+</body>
+
+</html>
