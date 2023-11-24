@@ -106,15 +106,7 @@
         import { getAuth,createUserWithEmailAndPassword,sendEmailVerification  } from 'https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js'
 
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAoLWeOUwHg--jTIc1k9RhiYREI9VhWi7Q",
-            authDomain: "git-auth-project.firebaseapp.com",
-            projectId: "git-auth-project",
-            storageBucket: "git-auth-project.appspot.com",
-            messagingSenderId: "531813829325",
-            appId: "1:531813829325:web:247a7bea4ab93d885d3784",
-            measurementId: "G-L65RE20B18",
-        };
+        const firebaseConfig = {{firebaseConfig | tojson | safe}}
 
         // Initialize Firebase
         const FireBaseApp = initializeApp(firebaseConfig);
